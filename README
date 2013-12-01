@@ -1,0 +1,21 @@
+echo:           example of multi-process TCP based Echo Service (RFC862).
+
+                One echo service is defined as a connection based application
+                on TCP. A server listens for TCP connections on TCP port 7.
+                Once a connection is established any data received is sent
+                back. This continues until the calling user terminates the
+                connection.
+                The TCP echo server accepts a connection and then loops
+                continuously, reading all transmitted data and sending it back
+                to the client on the same socket.
+                The server continues reading until it detects end-of-file, at
+                which point it closes its socket (so that the client sees
+                end-of-file if it is still reading from its socket).
+                Since the client may send an indefinite amount of data to the
+                server (and thus servicing the client may take an indefinite
+                amount of time), a concurrent server design is appropriate,
+                so that multiple clients can be simultaneously served.
+
+author:         Paolo Rovelli
+contact:        paolo.rovelli@ericsson.com
+
