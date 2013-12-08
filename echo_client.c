@@ -25,11 +25,13 @@
 struct echo_client_data {
 	int fd;
 	struct addrinfo *addr;
+	int argc;
+	char **argv;
 	int debug;
 };
 
 /*
- * echo_client_send - ECHO client send
+ * echo_client_send - ECHO client send function
  */
 int echo_client_send(struct echo_client_data *data, const void *buf, size_t count)
 {
@@ -52,16 +54,66 @@ int echo_client_send(struct echo_client_data *data, const void *buf, size_t coun
 }
 
 /*
- * echo_client_session - ECHO client dummy session
+ * echo_client_recv - ECHO client receive function
+ */
+int echo_client_recv(struct echo_client_data *data, void *buf, size_t count)
+{
+	int n, ret;
+	char *ptr;
+
+	ptr = buf;
+	for (ret = 0; ret < count; ) {
+		n = read(data->fd, ptr, count - ret);
+		if (n == 0)
+			return ret;
+		if (n <= 0) {
+			if (n == -1 && errno == EINTR)
+				continue; /* interrupted, restart read() */
+			else
+				return -1; /* some other error */
+		}
+		ret += n;
+		ptr += n;
+	}
+	return ret;
+}
+
+/*
+ * echo_client_session - ECHO client random session
  */
 static int echo_client_session(struct echo_client_data *data)
 {
-	echo_client_send(data, "Paolo", 5);
-	echo_client_send(data, " ", 1);
-	echo_client_send(data, "Rovelli", 7);
-	echo_client_send(data, "\n", 1);
+	int count_r, count_w;
+	int i, len;
+	char *buf;
 
-	// sleep(1);	
+	for (i = 0; i < data->argc; i++) {
+
+		/* alloc a data buffer */
+		len = strlen(data->argv[i]);
+		buf = malloc(len + 2);
+		if (!buf) {
+			echo_log(LOG_ERR, "failure in malloc(): %s\n",
+				strerror(errno));
+			return -1;
+		}
+
+		/* send data */
+		count_w = echo_client_send(data, data->argv[i], len);
+		echo_log(LOG_DEBUG, "sent %d bytes\n", count_w);
+
+		/* receive data */
+		count_r = echo_client_recv(data, buf, len);
+		echo_log(LOG_DEBUG, "recv %d bytes\n", count_r);
+		
+		/* print the received data */
+		buf[count_r] = !data->debug && i < data->argc - 1 ? ' ' : '\n';
+		buf[count_r + 1] = '\0';
+		fprintf(data->debug ? stderr : stdout, "%s", buf);
+
+		/* release the data buffer */
+		free(buf);
+	}
 
 	return 0;
 }
@@ -111,16 +163,17 @@ out1:
 static void echo_client_usage(FILE * out)
 {
 	static const char usage_str[] =
-		("Usage:                                                \n"
-		"  echo client [options]                               \n\n"
-		"Options:                                               \n"
+		("Usage:                                                 \n"
+		"  echo-client [options] [text] ...                    \n\n"
+		"Options:                                                \n"
 		"  -a | --address    echo server address/hostname        \n"
 		"  -p | --port       echo server port/service            \n"
-		"  -d | --debug      echo client debug mode              \n"
-		"  -v | --version    show the program version and exit  \n"
-		"  -h | --help       show this help and exit          \n\n"
-		"Examples:                                              \n"
-		"  echo client -d --address localhost --port 4189      \n\n");
+		"  -d | --debug      run the program in debug mode      \n"
+		"  -v | --version    show the program version and exit   \n"
+		"  -h | --help       show this help and exit           \n\n"
+		"Examples:                                               \n"
+		"  echo-client \"this text\" and this other text!        \n"
+		"  echo-client -d -a localhost -p 7777 \"this text\"   \n\n");
 
 	fprintf(out, "%s", usage_str);
 	fflush(out);
@@ -147,7 +200,7 @@ static const struct option echo_client_options[] = {
 	{NULL, 0, NULL, 0}
 };
 
-int echo_client_main(int argc, char *argv[])
+int main(int argc, char *argv[])
 {
 	int err, opt;
 	int debug = 0;
@@ -194,6 +247,8 @@ int echo_client_main(int argc, char *argv[])
 		goto out1;
 	}
 	data->debug = debug;
+	data->argc = argc - optind;
+	data->argv = argv + optind;
 
 	/* obtain address(es) structure matching host/service */
 	memset(&hints, 0, sizeof(hints));

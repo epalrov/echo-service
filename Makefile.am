@@ -1,8 +1,9 @@
-bin_PROGRAMS = echo
+bin_PROGRAMS = echo-server echo-client
 
-echo_SOURCES  = echo.c 
-echo_SOURCES += echo_server.c 
-echo_SOURCES += echo_client.c 
-echo_SOURCES += echo_log.c 
-echo_SOURCES += echo_pidfile.c 
+echo_server_SOURCES  = echo_server.c 
+echo_server_SOURCES += echo_log.c 
+echo_server_SOURCES += echo_pidfile.c 
+
+echo_client_SOURCES  = echo_client.c 
+echo_client_SOURCES += echo_log.c 
 

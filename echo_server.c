@@ -25,7 +25,7 @@
 #define ECHO_SERVICE "7"
 #define ECHO_PIDFILE "/var/run/echo.pid"
 
-#define ECHO_BUFSIZE 4
+#define ECHO_BUFSIZE 1024
 
 struct echo_server_data {
 	int cfd;
@@ -233,16 +233,17 @@ out:
 static void echo_server_usage(FILE * out)
 {
 	static const char usage_str[] =
-		("Usage:                                                \n"
-		"  echo server [options]                              \n\n"
-		"Options:                                               \n"
-		"  -a | --address    echo server address                \n"
-		"  -p | --port       echo server port                   \n"
-		"  -d | --debug      echo server debug mode             \n"
-		"  -v | --version    show the program version and exit  \n"
-		"  -h | --help       show this help and exit          \n\n"
-		"Examples:                                              \n"
-		"  echo server -d -p 7777                             \n\n");
+		("Usage:                                                 \n"
+		"  echo-server [options]                               \n\n"
+		"Options:                                                \n"
+		"  -a | --address    echo server address                 \n"
+		"  -p | --port       echo server port                    \n"
+		"  -d | --debug      run the program in debug mode       \n"
+		"  -v | --version    show the program version and exit   \n"
+		"  -h | --help       show this help and exit           \n\n"
+		"Examples:                                               \n"
+		"  echo-server                                         \n\n"
+		"  echo-server -d --address localhost -port 7777       \n\n");
 
 	fprintf(out, "%s", usage_str);
 	fflush(out);
@@ -269,7 +270,7 @@ static const struct option echo_server_options[] = {
 	{NULL, 0, NULL, 0}
 };
 
-int echo_server_main(int argc, char *argv[])
+int main(int argc, char *argv[])
 {
 	int err, opt;
 	int debug = 0;
@@ -374,7 +375,8 @@ int echo_server_main(int argc, char *argv[])
 	} else {
 		if (!echo_pidfile_create(ECHO_PIDFILE)) {
 			/* can't create pidfile (fatal error, exit) */
-			echo_log(LOG_ERR, "can't create ECHO pidfile\n");
+			echo_log(LOG_ERR, "can't create ECHO pidfile: %s\n",
+				strerror(errno));
 			if (getpid() != ppid)
 				kill (ppid, SIGTERM);
 			exit(EXIT_FAILURE);
