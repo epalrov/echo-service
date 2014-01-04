@@ -1,4 +1,5 @@
-echo
+echo-server
+echo-client
 *.o
 .deps/
 Makefile

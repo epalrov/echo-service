@@ -1,9 +1,9 @@
 /*
  * echo_log.c - ECHO logger
  *
- * Copyright (C) 2013 Ericsson AB
+ * Copyright (C) 2013 Paolo Rovelli
  *
- * Author: Paolo Rovelli <paolo.rovelli@ericsson.com>
+ * Author: Paolo Rovelli <paolorovelli@yahoo.it>
  */
 
 #include <stdio.h>

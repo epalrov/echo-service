@@ -1,7 +1,7 @@
 /*
  * echo_pidfile.h - ECHO pidfile interface
  *
- * Copyright (C) 2013 Ericsson AB
+ * Copyright (C) 2013 Paolo Rovelli
  *
  * Author: Paolo Rovelli <paolor.rovelli@ericsson.com>
  */

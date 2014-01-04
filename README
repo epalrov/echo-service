@@ -17,5 +17,5 @@ echo:           example of multi-process TCP based Echo Service (RFC862).
                 so that multiple clients can be simultaneously served.
 
 author:         Paolo Rovelli
-contact:        paolo.rovelli@ericsson.com
+contact:        paolorovelli@yahoo.it
 

@@ -2,7 +2,7 @@
 # Process this file with autoconf to produce a configure script.
 
 AC_PREREQ([2.67])
-AC_INIT([echo], [1.0], [paolo.rovelli@ericsson.com])
+AC_INIT([echo], [1.0], [paolorovelli@yahoo.it])
 AM_INIT_AUTOMAKE(echo, 1.0)
 
 # Checks for programs.

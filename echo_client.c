@@ -1,9 +1,9 @@
 /*
  * echo_client.c - ECHO client application
  *
- * Copyright (C) 2013 Ericsson AB
+ * Copyright (C) 2013 Paolo Rovelli
  *
- * Author: Paolo Rovelli <paolo.rovelli@ericsson.com>
+ * Author: Paolo Rovelli <paolorovelli@yahoo.it>
  */
 
 #include <errno.h>
