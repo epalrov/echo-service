@@ -38,11 +38,11 @@ struct echo_server_data {
 
 static int echo_session(struct echo_server_data *data)
 {
-	char *buf;
+	char *buf_r, *buf_w;
 	ssize_t count_r, count_w;
 	
-	buf = malloc(ECHO_BUFSIZE);
-	if (!buf) {
+	buf_r = malloc(ECHO_BUFSIZE);
+	if (!buf_r) {
 		echo_log(LOG_ERR, "failure in malloc(): %s\n",
 			strerror(errno));
 		goto out1;
@@ -50,19 +50,21 @@ static int echo_session(struct echo_server_data *data)
 
 	while (1) {
 		/* read a chunk from the incoming stream */
-		count_r = read(data->cfd, buf, ECHO_BUFSIZE);
+		count_r = read(data->cfd, buf_r, ECHO_BUFSIZE);
 		if (count_r > 0) {
 			echo_log(LOG_DEBUG, "recv %d bytes from '%s:%s'\n",
 				count_r, data->hbuf, data->sbuf);
 			
 			/* write back the incoming stream */
+			buf_w = buf_r;
 			while (count_r > 0) {
-				count_w = write(data->cfd, buf, count_r);
+				count_w = write(data->cfd, buf_w, count_r);
 				if (count_w > 0) {
 					echo_log(LOG_DEBUG, "sent %d bytes to "
 						"'%s:%s'\n", count_w,
 						data->hbuf, data->sbuf);
 					count_r -= count_w;
+					buf_w += count_w;
 				} else {
 					if (count_w < 0 && errno == EINTR)
 						continue; /* interrupted */
@@ -86,7 +88,7 @@ static int echo_session(struct echo_server_data *data)
 	}
 
 out2:
-	free(buf);
+	free(buf_r);
 out1:
 	return -1;
 }
