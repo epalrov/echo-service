@@ -1,4 +1,6 @@
-echo:           example of multi-process TCP based Echo Service (RFC862).
+project:        Echo Service
+
+description:    Example of multi-process TCP based Echo Service (RFC862).
 
                 One echo service is defined as a connection based application
                 on TCP. A server listens for TCP connections on TCP port 7.
@@ -15,6 +17,8 @@ echo:           example of multi-process TCP based Echo Service (RFC862).
                 server (and thus servicing the client may take an indefinite
                 amount of time), a concurrent server design is appropriate,
                 so that multiple clients can be simultaneously served.
+
+build:          autoreconf && ./configure && make
 
 author:         Paolo Rovelli
 contact:        paolorovelli@yahoo.it
